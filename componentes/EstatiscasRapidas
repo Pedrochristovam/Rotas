@@ -1,0 +1,75 @@
+import React from "react";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Building2, MapPin, Activity, TrendingUp } from "lucide-react";
+import { motion } from "framer-motion";
+
+export default function EstatisticasRapidas({ empresas }) {
+  const totalEmpresas = empresas.length;
+  const empresasComPoucosChamamdos = empresas.filter(e => e.controle_chamados <= 3).length;
+  const mediasChamados = empresas.length > 0 
+    ? (empresas.reduce((sum, e) => sum + e.controle_chamados, 0) / empresas.length).toFixed(1)
+    : 0;
+  const totalServicos = [...new Set(empresas.flatMap(e => e.quadro_atividades || []))].length;
+
+  const estatisticas = [
+    {
+      titulo: "Total de Empresas",
+      valor: totalEmpresas,
+      icon: Building2,
+      cor: "bg-blue-500",
+      descricao: "Empresas credenciadas"
+    },
+    {
+      titulo: "Baixa Demanda",
+      valor: empresasComPoucosChamamdos,
+      icon: TrendingUp,
+      cor: "bg-green-500",
+      descricao: "≤3 chamados"
+    },
+    {
+      titulo: "Média de Chamados",
+      valor: mediasChamados,
+      icon: Activity,
+      cor: "bg-purple-500",
+      descricao: "Por empresa"
+    },
+    {
+      titulo: "Serviços Únicos",
+      valor: totalServicos,
+      icon: MapPin,
+      cor: "bg-orange-500",
+      descricao: "Tipos disponíveis"
+    }
+  ];
+
+  return (
+    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+      {estatisticas.map((stat, index) => (
+        <motion.div
+          key={stat.titulo}
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: index * 0.1 }}
+        >
+          <Card className="relative overflow-hidden shadow-lg border-0 bg-white/80 backdrop-blur-sm hover:shadow-xl transition-all duration-300">
+            <div className={`absolute top-0 right-0 w-24 h-24 transform translate-x-8 -translate-y-8 ${stat.cor} rounded-full opacity-10`} />
+            <CardHeader className="pb-3">
+              <div className="flex justify-between items-start">
+                <div>
+                  <p className="text-sm font-medium text-gray-500">{stat.titulo}</p>
+                  <CardTitle className="text-2xl md:text-3xl font-bold mt-1 text-gray-900">
+                    {stat.valor}
+                  </CardTitle>
+                </div>
+                <div className={`p-3 rounded-xl ${stat.cor} bg-opacity-20`}>
+                  <stat.icon className={`w-5 h-5 ${stat.cor.replace('bg-', 'text-')}`} />
+                </div>
+              </div>
+              <p className="text-xs text-gray-400 mt-2">{stat.descricao}</p>
+            </CardHeader>
+          </Card>
+        </motion.div>
+      ))}
+    </div>
+  );
+}
