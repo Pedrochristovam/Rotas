@@ -1,0 +1,197 @@
+import React from "react";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Checkbox } from "@/components/ui/checkbox";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Badge } from "@/components/ui/badge";
+import { MapPin, Filter, RotateCcw, Search } from "lucide-react";
+import { Separator } from "@/components/ui/separator";
+
+export default function FiltrosAvancados({ filtros, onFiltroChange, onLimparFiltros, onBuscar }) {
+  const servicosDisponiveis = ["A", "B", "C", "D", "E", "F"];
+  const municipiosDisponiveis = ["I", "II", "III", "IV", "V", "VI", "VII", "VIII", "IX", "X"];
+  const regioesDisponiveis = [
+    "Zona da Mata",
+    "Sul de Minas",
+    "Centro-Oeste de Minas",
+    "Alto Paranaíba",
+    "Triângulo Mineiro",
+    "Noroeste de Minas",
+    "Norte de Minas",
+    "Rio Doce",
+    "Mucuri",
+    "Jequitinhonha",
+    "Belo Horizonte",
+    "Bahia", 
+    "São Paulo",
+    "Minas Gerais"
+  ];
+
+  const handleServicoToggle = (servico) => {
+    const novosServicos = filtros.servicos?.includes(servico)
+      ? filtros.servicos.filter(s => s !== servico)
+      : [...(filtros.servicos || []), servico];
+    onFiltroChange("servicos", novosServicos);
+  };
+
+  const handleMunicipioToggle = (municipio) => {
+    const novosMunicipios = filtros.municipios?.includes(municipio)
+      ? filtros.municipios.filter(m => m !== municipio)
+      : [...(filtros.municipios || []), municipio];
+    onFiltroChange("municipios", novosMunicipios);
+  };
+
+  return (
+    <Card className="shadow-lg border-0 bg-white/80 backdrop-blur-sm">
+      <CardHeader className="pb-4">
+        <CardTitle className="flex items-center gap-2 text-xl font-bold text-gray-900">
+          <Filter className="w-5 h-5 text-blue-600" />
+          Filtros de Busca
+        </CardTitle>
+      </CardHeader>
+      <CardContent className="space-y-6">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+          {/* Destino */}
+          <div className="space-y-2">
+            <Label htmlFor="destino" className="text-sm font-semibold text-gray-700 flex items-center gap-1">
+              <MapPin className="w-4 h-4 text-blue-500" />
+              Destino da Vistoria
+            </Label>
+            <Input
+              id="destino"
+              placeholder="Digite a cidade ou endereço"
+              value={filtros.destino || ""}
+              onChange={(e) => onFiltroChange("destino", e.target.value)}
+              className="border-gray-300 focus:border-blue-500 focus:ring-blue-500"
+            />
+          </div>
+
+          {/* Região/Estado */}
+          <div className="space-y-2">
+            <Label className="text-sm font-semibold text-gray-700">
+              Região Atendida
+            </Label>
+            <Select value={filtros.regiao || ""} onValueChange={(value) => onFiltroChange("regiao", value)}>
+              <SelectTrigger className="border-gray-300 focus:border-blue-500">
+                <SelectValue placeholder="Selecione uma região" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value={null}>Todas as regiões</SelectItem>
+                {regioesDisponiveis.map((regiao) => (
+                  <SelectItem key={regiao} value={regiao}>
+                    {regiao}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          </div>
+
+          {/* Controle de Chamados */}
+          <div className="space-y-2">
+            <Label className="text-sm font-semibold text-gray-700">
+              Histórico de Chamados
+            </Label>
+            <Select value={filtros.ordenacaoChamados || ""} onValueChange={(value) => onFiltroChange("ordenacaoChamados", value)}>
+              <SelectTrigger className="border-gray-300 focus:border-blue-500">
+                <SelectValue placeholder="Ordenar por chamados" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value={null}>Sem ordenação</SelectItem>
+                <SelectItem value="menos_chamadas">Menos chamadas primeiro</SelectItem>
+                <SelectItem value="mais_chamadas">Mais chamadas primeiro</SelectItem>
+              </SelectContent>
+            </Select>
+          </div>
+
+          {/* Busca por Serviços */}
+          <div className="space-y-2">
+            <Label className="text-sm font-semibold text-gray-700">
+              Buscar nos Serviços
+            </Label>
+            <Input
+              placeholder="Digite palavra-chave dos serviços"
+              value={filtros.buscaServicos || ""}
+              onChange={(e) => onFiltroChange("buscaServicos", e.target.value)}
+              className="border-gray-300 focus:border-blue-500 focus:ring-blue-500"
+            />
+          </div>
+        </div>
+
+        <Separator />
+
+        {/* Serviços */}
+        <div className="space-y-3">
+          <Label className="text-sm font-semibold text-gray-700">
+            Tipos de Serviços (Quadro de Atividades)
+          </Label>
+          <div className="flex flex-wrap gap-2">
+            {servicosDisponiveis.map((servico) => (
+              <Badge
+                key={servico}
+                variant={filtros.servicos?.includes(servico) ? "default" : "outline"}
+                className={`cursor-pointer transition-all duration-200 hover:scale-105 ${
+                  filtros.servicos?.includes(servico)
+                    ? "bg-blue-600 hover:bg-blue-700"
+                    : "hover:bg-blue-50 hover:border-blue-300"
+                }`}
+                onClick={() => handleServicoToggle(servico)}
+              >
+                Serviço {servico}
+              </Badge>
+            ))}
+          </div>
+        </div>
+
+        <Separator />
+
+        {/* Municípios */}
+        <div className="space-y-3">
+          <Label className="text-sm font-semibold text-gray-700">
+            Municípios Atendidos
+          </Label>
+          <div className="grid grid-cols-2 sm:grid-cols-5 gap-3">
+            {municipiosDisponiveis.map((municipio) => (
+              <div key={municipio} className="flex items-center space-x-2">
+                <Checkbox
+                  id={municipio}
+                  checked={filtros.municipios?.includes(municipio) || false}
+                  onCheckedChange={() => handleMunicipioToggle(municipio)}
+                  className="border-gray-300"
+                />
+                <Label
+                  htmlFor={municipio}
+                  className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
+                >
+                  {municipio}
+                </Label>
+              </div>
+            ))}
+          </div>
+        </div>
+
+        <Separator />
+
+        {/* Botões */}
+        <div className="flex flex-col sm:flex-row gap-3">
+          <Button
+            onClick={onBuscar}
+            className="flex-1 bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 text-white font-semibold shadow-lg hover:shadow-xl transition-all duration-300"
+          >
+            <Search className="w-4 h-4 mr-2" />
+            Buscar Empresas
+          </Button>
+          <Button
+            variant="outline"
+            onClick={onLimparFiltros}
+            className="border-gray-300 hover:bg-gray-50 text-gray-700 font-semibold transition-all duration-300"
+          >
+            <RotateCcw className="w-4 h-4 mr-2" />
+            Limpar Filtros
+          </Button>
+        </div>
+      </CardContent>
+    </Card>
+  );
+}
